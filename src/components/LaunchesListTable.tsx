@@ -61,7 +61,10 @@ function Table({ columns, data }: { columns: any; data: any }) {
             {headerGroups.map((headerGroup) => (
               <TableRow {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => (
-                  <TableCell {...column.getHeaderProps()}>
+                  <TableCell
+                    {...column.getHeaderProps()}
+                    sx={{ fontWeight: "bold" }}
+                  >
                     {column.render("Header")}
                   </TableCell>
                 ))}
