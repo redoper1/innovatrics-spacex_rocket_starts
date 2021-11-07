@@ -1,5 +1,3 @@
-import { useStyles } from "../App";
-import MaULink from "@material-ui/core/Link";
 import { Link } from "react-router-dom";
 
 import { useParams } from "react-router-dom";
@@ -7,9 +5,17 @@ import { useQuery } from "urql";
 import { PastLaunchesQuery } from "./LaunchesList";
 
 import Youtube from "react-youtube";
+import {
+  Link as MuiLink,
+  Typography,
+  Box,
+  Table as MuiTable,
+  TableBody,
+  TableRow,
+  TableCell,
+} from "@mui/material";
 
 function LaunchDetail() {
-  const classes = useStyles();
   const { launchId } = useParams();
 
   const [result] = useQuery({
@@ -23,8 +29,9 @@ function LaunchDetail() {
     launchData = data.launchesPast.filter(
       (launch) => launch.id === launchId
     )[0];
-
     if (
+      launchData &&
+      launchData !== undefined &&
       typeof launchData.links.video_link === "string" &&
       (launchData.links.video_link.startsWith("https://youtu.be") ||
         launchData.links.video_link.startsWith("https://youtube.com"))
@@ -36,34 +43,71 @@ function LaunchDetail() {
   }
 
   return (
-    <div className="launchDetail">
-      <MaULink sx={{ mx: "auto" }} component={Link} to="/">
-        Go back to the list
-      </MaULink>
+    <Box sx={{ display: "flex", flexDirection: "column" }}>
+      <MuiLink sx={{ mx: "auto" }} component={Link} to="/">
+        {"<< Go back to the list"}
+      </MuiLink>
       {fetching && <p>Loading...</p>}
-      {error && <div className="error">Error: {error.message}</div>}
-      {Object.keys(launchData).length > 0 ? (
+      {error && error !== undefined && (
+        <Box sx={{ color: "error.main" }}>Error: {error.message}</Box>
+      )}
+      {launchData !== undefined && Object.keys(launchData).length > 0 && (
         <>
-          <h1 className="launchDetail__mission_name">
+          <Typography variant="h1" sx={{ textAlign: "center" }}>
             {launchData.mission_name}
-          </h1>
-          <div className="launchDetail__launch_dates">
-            <div className="launchDetail__launch_dates_launch_date_local">
-              Launch date (local): {launchData.launch_date_local}
-            </div>
-            <div className="launchDetail__launch_dates_launch_date_utc">
-              <span className={classes.bold}>Launch date (UTC):</span>{" "}
-              <span>{launchData.launch_date_utc}</span>
-            </div>
-          </div>
+          </Typography>
+          <MuiTable>
+            <TableBody>
+              <TableRow>
+                <TableCell sx={{ fontWeight: "bold" }}>
+                  Launch date (local):
+                </TableCell>
+                <TableCell>{launchData.launch_date_local}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ fontWeight: "bold" }}>
+                  Launch date (UTC):
+                </TableCell>
+                <TableCell>{launchData.launch_date_utc}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ fontWeight: "bold" }}>Rocket name:</TableCell>{" "}
+                <TableCell>{launchData.rocket.rocket_name}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ fontWeight: "bold" }}>
+                  Launch status:
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: "bold",
+                    color: launchData.launch_success
+                      ? "success.main"
+                      : "error.main",
+                  }}
+                >
+                  {launchData.launch_success ? "Successfull" : "Unsuccessful"}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </MuiTable>
           {launchData.youtube_video_id && (
-            <Youtube videoId={launchData.youtube_video_id} />
+            <Box sx={{ mx: "auto", mt: "1em" }}>
+              <Youtube videoId={launchData.youtube_video_id} />
+            </Box>
           )}
         </>
-      ) : (
-        <div className="error">Launch was not found</div>
       )}
-    </div>
+      {!fetching &&
+        (launchData === undefined || Object.keys(launchData).length === 0) && (
+          <Typography
+            variant="h1"
+            sx={{ color: "error.main", textAlign: "center", marginTop: 0 }}
+          >
+            Launch was not found
+          </Typography>
+        )}
+    </Box>
   );
 }
 

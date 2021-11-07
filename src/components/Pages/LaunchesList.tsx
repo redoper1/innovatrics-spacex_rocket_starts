@@ -1,6 +1,6 @@
 import { useQuery } from "urql";
 import LaunchesListTable from "../LaunchesListTable";
-import { useStyles } from "../App";
+import { Box, Typography } from "@mui/material";
 
 export const PastLaunchesQuery = `
   query {
@@ -22,8 +22,6 @@ export const PastLaunchesQuery = `
 `;
 
 function LaunchesList() {
-  const classes = useStyles();
-
   const [result] = useQuery({
     query: PastLaunchesQuery,
   });
@@ -31,14 +29,21 @@ function LaunchesList() {
   const { data, fetching, error } = result;
 
   return (
-    <div className="launchesList">
-      <h1 className={classes.mt0}>Past launches list</h1>
-      {fetching && <p>Loading...</p>}
-      {error && <p className="error">Error: {error.message}</p>}
-      {data && data.launchesPast ? (
+    <div>
+      <Typography variant="h1" sx={{ marginTop: 0 }}>
+        Past launches list
+      </Typography>
+      {fetching && <Typography variant="body1">Loading...</Typography>}
+      {error && error !== undefined && (
+        <Typography variant="body1" sx={{ color: "error.main" }}>
+          Error: {error.message}
+        </Typography>
+      )}
+      {data && data.launchesPast && (
         <LaunchesListTable data={data.launchesPast} />
-      ) : (
-        <div className="error">No launch was found</div>
+      )}
+      {!fetching && !data.launchesPast && (
+        <Box sx={{ color: "error.main" }}>No launch was found</Box>
       )}
     </div>
   );

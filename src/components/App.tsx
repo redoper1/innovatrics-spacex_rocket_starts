@@ -1,62 +1,57 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { createClient, Provider } from "urql";
 
-import { CssBaseline } from "@material-ui/core";
-
 import { Error404 } from "./Pages/Errors";
 import LaunchesList from "./Pages/LaunchesList";
 import LaunchDetail from "./Pages/LaunchDetail";
 
-import { makeStyles } from "@material-ui/core/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import {
+  createTheme,
+  StyledEngineProvider,
+  ThemeProvider,
+} from "@mui/material/styles";
+import Container from "@mui/material/Container";
 
 const urqlClient = createClient({
   url: "https://api.spacex.land/graphql/",
 });
 
-export const useStyles = makeStyles({
-  bold: {
-    fontWeight: 600,
+const theme = createTheme({
+  components: {
+    MuiLink: {
+      defaultProps: {
+        underline: "hover",
+      },
+    },
   },
-
-  dFlex: {
-    display: "flex",
-  },
-
-  justifyContentSpaceEvenly: {
-    justifyContent: "space-evenly",
-  },
-
-  mx15: {
-    marginLeft: "15px",
-    marginRight: "15px",
-  },
-
-  mt0: {
-    marginTop: 0,
-  },
-
-  mxAuto: {
-    marginLeft: "auto",
-    marginRight: "auto",
+  typography: {
+    h1: {
+      fontSize: "2em",
+      marginTop: "0.67em",
+      marginBottom: "0.67em",
+    },
   },
 });
 
 function App() {
-  const classes = useStyles();
-
   return (
     <Provider value={urqlClient}>
       <Router>
-        <CssBaseline />
-        <div className={"App " + classes.mx15}>
-          <Routes>
-            <Route path="/">
-              <Route index element={<LaunchesList />} />
-              <Route path="/launch/:launchId" element={<LaunchDetail />} />
-              <Route path="*" element={<Error404 />} />
-            </Route>
-          </Routes>
-        </div>
+        <StyledEngineProvider injectFirst>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Container>
+              <Routes>
+                <Route path="/">
+                  <Route index element={<LaunchesList />} />
+                  <Route path="/launch/:launchId" element={<LaunchDetail />} />
+                  <Route path="*" element={<Error404 />} />
+                </Route>
+              </Routes>
+            </Container>
+          </ThemeProvider>
+        </StyledEngineProvider>
       </Router>
     </Provider>
   );
