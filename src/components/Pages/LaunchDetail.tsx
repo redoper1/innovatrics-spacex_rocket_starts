@@ -81,6 +81,12 @@ function LaunchDetail() {
                 <TableCell>{launchData.rocket.rocket_name}</TableCell>
               </TableRow>
               <TableRow>
+                <TableCell sx={{ fontWeight: "bold" }}>Reuse count:</TableCell>
+                <TableCell>
+                  {launchData.rocket.first_stage.cores[0].core.reuse_count}
+                </TableCell>
+              </TableRow>
+              <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>
                   Launch status:
                 </TableCell>

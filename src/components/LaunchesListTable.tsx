@@ -21,6 +21,11 @@ function Table({ columns, data }: { columns: any; data: any }) {
     useTable({
       columns,
       data,
+      initialState: {
+        hiddenColumns: columns
+          .filter((col: any) => col.show === false)
+          .map((col: any) => col.id || col.accessor) as any,
+      },
     });
 
   return (
@@ -104,6 +109,7 @@ function LaunchesListTable(props: { data: any[] }) {
       {
         Header: "Launch date (local)",
         accessor: "launch_date_local",
+        show: false,
       },
       {
         Header: "Launch date (UTC)",
@@ -112,6 +118,11 @@ function LaunchesListTable(props: { data: any[] }) {
       {
         Header: "Launch status",
         accessor: "launch_success",
+      },
+      {
+        Header: "Reuse count",
+        accessor: "reuse_count",
+        show: false,
       },
       {
         Header: "",
@@ -133,6 +144,7 @@ function LaunchesListTable(props: { data: any[] }) {
         <Chip icon={<ClearIcon />} label="Unsuccessful" color="error" />
       ),
       rocket_name: item.rocket.rocket_name,
+      reuse_count: item.rocket.first_stage.cores[0].core.reuse_count,
       link_to_detail: (
         <MuiLink component={Link} to={"/launch/" + item.id}>
           Launch detail

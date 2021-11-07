@@ -14,6 +14,15 @@ export interface Launch {
   };
   rocket: {
     rocket_name: string;
+    first_stage: {
+      cores: [
+        {
+          core: {
+            reuse_count: number;
+          };
+        }
+      ];
+    };
   };
 }
 
@@ -31,9 +40,16 @@ export const PastLaunchesQuery = `
       }
       rocket {
         rocket_name
+        first_stage {
+          cores {
+            core {
+              reuse_count
+            }
+          }
+        }
       }
     }
-  }  
+  }
 `;
 
 function LaunchesList() {
