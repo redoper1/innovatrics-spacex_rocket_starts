@@ -1,132 +1,90 @@
-import { useStyles } from "./App";
-import MaUTable from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Chip from "@material-ui/core/Chip";
-import CheckIcon from "@material-ui/icons/Check";
-import ClearIcon from "@material-ui/icons/Clear";
-import MaULink from "@material-ui/core/Link";
-import { Link } from "react-router-dom";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Checkbox from "@material-ui/core/Checkbox";
-
 import { useTable } from "react-table";
-import { useMemo, forwardRef, useRef, useEffect } from "react";
+import { useMemo } from "react";
 
-interface IndeterminateCheckboxProps {
-  indeterminate?: boolean;
-  label?: string;
-}
-
-const useCombinedRefs = (...refs): React.MutableRefObject<any> => {
-  const targetRef = useRef();
-
-  useEffect(() => {
-    refs.forEach((ref) => {
-      if (!ref) return;
-
-      if (typeof ref === "function") {
-        ref(targetRef.current);
-      } else {
-        ref.current = targetRef.current;
-      }
-    });
-  }, [refs]);
-
-  return targetRef;
-};
-
-const IndeterminateCheckbox = forwardRef<
-  HTMLInputElement,
-  IndeterminateCheckboxProps
->(({ indeterminate, ...rest }, ref) => {
-  const defaultRef = useRef(null);
-  const resolvedRef = useCombinedRefs(ref, defaultRef);
-
-  useEffect(() => {
-    resolvedRef.current.indeterminate = indeterminate;
-  }, [resolvedRef, indeterminate]);
-
-  //return <input type="checkbox" ref={resolvedRef} {...rest} />;
-
-  const label = rest.label ? rest.label : "";
-
-  return (
-    <FormControlLabel
-      control={<Checkbox ref={resolvedRef} {...rest} />}
-      label={label}
-    />
-  );
-});
+import { Link } from "react-router-dom";
+import {
+  Table as MuiTable,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Chip,
+  Link as MuiLink,
+  FormControlLabel,
+  Checkbox,
+  Box,
+} from "@mui/material";
+import { Check as CheckIcon, Clear as ClearIcon } from "@mui/icons-material";
 
 function Table({ columns, data }) {
-  const classes = useStyles();
-  const {
-    getTableProps,
-    headerGroups,
-    rows,
-    prepareRow,
-    allColumns,
-    getToggleHideAllColumnsProps,
-  } = useTable({
-    columns,
-    data,
-  });
+  const { getTableProps, headerGroups, rows, prepareRow, allColumns } =
+    useTable({
+      columns,
+      data,
+    });
 
   return (
-    <div className="launchesList__table">
-      <div className="launchesList__table__columnsControl">
-        <h2>Toggle columns visibility</h2>
-        <div
-          className={classes.dFlex + " " + classes.justifyContentSpaceEvenly}
+    <Box>
+      <Box>
+        <Box sx={{ fontWeight: "bold" }}>Toggle columns visibility:</Box>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-evenly",
+            flexWrap: "wrap",
+          }}
         >
-          <IndeterminateCheckbox
-            {...getToggleHideAllColumnsProps()}
-            label="Toggle All"
-          />
           {allColumns
             .filter((column) => column.id !== "link_to_detail")
             .map((column) => (
               <FormControlLabel
                 key={column.id}
-                control={<Checkbox {...column.getToggleHiddenProps()} />}
+                control={
+                  <Checkbox
+                    color="primary"
+                    {...column.getToggleHiddenProps()}
+                  />
+                }
                 label={column.Header}
               />
             ))}
-        </div>
-      </div>
-      <MaUTable {...getTableProps()} className="launchesList__table__table">
-        <TableHead>
-          {headerGroups.map((headerGroup) => (
-            <TableRow {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <TableCell {...column.getHeaderProps()}>
-                  {column.render("Header")}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableHead>
-        <TableBody>
-          {rows.map((row, i) => {
-            prepareRow(row);
-            return (
-              <TableRow {...row.getRowProps()}>
-                {row.cells.map((cell) => {
-                  return (
-                    <TableCell {...cell.getCellProps()}>
-                      {cell.render("Cell")}
-                    </TableCell>
-                  );
-                })}
+        </Box>
+      </Box>
+      <Box sx={{ overflowX: "auto" }}>
+        <MuiTable {...getTableProps()}>
+          <TableHead sx={{ backgroundColor: "grey.200" }}>
+            {headerGroups.map((headerGroup) => (
+              <TableRow {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column) => (
+                  <TableCell {...column.getHeaderProps()}>
+                    {column.render("Header")}
+                  </TableCell>
+                ))}
               </TableRow>
-            );
-          })}
-        </TableBody>
-      </MaUTable>
-    </div>
+            ))}
+          </TableHead>
+          <TableBody>
+            {rows.map((row, i) => {
+              prepareRow(row);
+              return (
+                <TableRow
+                  {...row.getRowProps()}
+                  sx={{ backgroundColor: i % 2 ? "grey.100" : "" }}
+                >
+                  {row.cells.map((cell) => {
+                    return (
+                      <TableCell {...cell.getCellProps()}>
+                        {cell.render("Cell")}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </MuiTable>
+      </Box>
+    </Box>
   );
 }
 
@@ -152,7 +110,7 @@ function LaunchesListTable(props: { data: any[] }) {
         accessor: "launch_date_utc",
       },
       {
-        Header: "Status",
+        Header: "Launch status",
         accessor: "launch_success",
       },
       {
@@ -170,15 +128,15 @@ function LaunchesListTable(props: { data: any[] }) {
       launch_date_local: item.launch_date_local,
       launch_date_utc: item.launch_date_utc,
       launch_success: item.launch_success ? (
-        <Chip icon={<CheckIcon />} label="Successfull" color="primary" />
+        <Chip icon={<CheckIcon />} label="Successfull" color="success" />
       ) : (
-        <Chip icon={<ClearIcon />} label="Unsuccessful" color="secondary" />
+        <Chip icon={<ClearIcon />} label="Unsuccessful" color="error" />
       ),
       rocket_name: item.rocket.rocket_name,
       link_to_detail: (
-        <MaULink component={Link} to={"/launch/" + item.id}>
+        <MuiLink component={Link} to={"/launch/" + item.id}>
           Launch detail
-        </MaULink>
+        </MuiLink>
       ),
     };
   });
