@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 import { useParams } from "react-router-dom";
 import { useQuery } from "urql";
-import { PastLaunchesQuery } from "./LaunchesList";
+import { PastLaunchesQuery, Launch } from "./LaunchesList";
 
 import Youtube from "react-youtube";
 import {
@@ -25,9 +25,15 @@ function LaunchDetail() {
   const { data, fetching, error } = result;
 
   let launchData = {} as any;
-  if (data && data.launchesPast !== undefined) {
+  if (
+    !fetching &&
+    data &&
+    data !== undefined &&
+    data.launchesPast !== undefined &&
+    launchId !== undefined
+  ) {
     launchData = data.launchesPast.filter(
-      (launch) => launch.id === launchId
+      (launch: Launch) => launch.id === launchId
     )[0];
     if (
       launchData &&
@@ -71,7 +77,7 @@ function LaunchDetail() {
                 <TableCell>{launchData.launch_date_utc}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell sx={{ fontWeight: "bold" }}>Rocket name:</TableCell>{" "}
+                <TableCell sx={{ fontWeight: "bold" }}>Rocket name:</TableCell>
                 <TableCell>{launchData.rocket.rocket_name}</TableCell>
               </TableRow>
               <TableRow>

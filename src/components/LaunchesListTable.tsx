@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { Check as CheckIcon, Clear as ClearIcon } from "@mui/icons-material";
 
-function Table({ columns, data }) {
+function Table({ columns, data }: { columns: any; data: any }) {
   const { getTableProps, headerGroups, rows, prepareRow, allColumns } =
     useTable({
       columns,

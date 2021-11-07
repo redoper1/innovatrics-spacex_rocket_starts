@@ -2,6 +2,21 @@ import { useQuery } from "urql";
 import LaunchesListTable from "../LaunchesListTable";
 import { Box, Typography } from "@mui/material";
 
+export interface Launch {
+  id: string;
+  mission_name: string;
+  launch_date_local: string;
+  launch_date_utc: string;
+  launch_success: boolean | null;
+  links: {
+    article_link: string;
+    video_link: string;
+  };
+  rocket: {
+    rocket_name: string;
+  };
+}
+
 export const PastLaunchesQuery = `
   query {
     launchesPast {
@@ -39,7 +54,7 @@ function LaunchesList() {
           Error: {error.message}
         </Typography>
       )}
-      {data && data.launchesPast && (
+      {!fetching && data && data !== undefined && data.launchesPast && (
         <LaunchesListTable data={data.launchesPast} />
       )}
       {!fetching && !data.launchesPast && (
